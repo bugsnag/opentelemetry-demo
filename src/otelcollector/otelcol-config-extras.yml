@@ -16,3 +16,14 @@
 #    pipelines:
 #      traces:
 #        exporters: [spanmetrics, otlphttp/example]
+
+exporters:
+  otlp/bugsnag:
+    endpoint: "<YOUR_BUGSNAG_API_KEY>.otlp.bugsnag.com:4317"
+  # otlphttp/bugsnag:
+  #   endpoint: "https://<YOUR_BUGSNAG_API_KEY>.otlp.bugsnag.com:4318"
+
+service:
+  pipelines:
+    traces:
+      exporters: [spanmetrics, otlp/bugsnag] # or otlphttp/bugsnag
