@@ -36,7 +36,7 @@ services:
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://${OTEL_COLLECTOR_HOST}:${OTEL_COLLECTOR_PORT_HTTP}
       - OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
       - OTEL_RESOURCE_ATTRIBUTES
-      - OTEL_SERVICE_NAME=accountingservice
+      - OTEL_SERVICE_NAME=bugsnag-otel-demo-accountingservice
     depends_on:
       otelcol:
         condition: service_started
@@ -68,7 +68,7 @@ services:
       - OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
       - OTEL_RESOURCE_ATTRIBUTES
       - OTEL_LOGS_EXPORTER=otlp
-      - OTEL_SERVICE_NAME=adservice
+      - OTEL_SERVICE_NAME=bugsnag-otel-demo-adservice
     depends_on:
       otelcol:
         condition: service_started
@@ -99,7 +99,7 @@ services:
       - VALKEY_ADDR
       - OTEL_EXPORTER_OTLP_ENDPOINT
       - OTEL_RESOURCE_ATTRIBUTES
-      - OTEL_SERVICE_NAME=cartservice
+      - OTEL_SERVICE_NAME=bugsnag-otel-demo-cartservice
       - ASPNETCORE_URLS=http://*:${CART_SERVICE_PORT}
     depends_on:
       valkey-cart:
@@ -140,7 +140,7 @@ services:
       - OTEL_EXPORTER_OTLP_ENDPOINT
       - OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
       - OTEL_RESOURCE_ATTRIBUTES
-      - OTEL_SERVICE_NAME=checkoutservice
+      - OTEL_SERVICE_NAME=bugsnag-otel-demo-checkoutservice
     depends_on:
       cartservice:
         condition: service_started
@@ -182,7 +182,7 @@ services:
       - CURRENCY_SERVICE_PORT
       - VERSION=${IMAGE_VERSION}
       - OTEL_EXPORTER_OTLP_ENDPOINT
-      - OTEL_RESOURCE_ATTRIBUTES=${OTEL_RESOURCE_ATTRIBUTES},service.name=currencyservice   # The C++ SDK does not support OTEL_SERVICE_NAME
+      - OTEL_RESOURCE_ATTRIBUTES=${OTEL_RESOURCE_ATTRIBUTES},service.name=bugsnag-otel-demo-currencyservice # The C++ SDK does not support OTEL_SERVICE_NAME
     depends_on:
       otelcol:
         condition: service_started
@@ -209,7 +209,7 @@ services:
       - EMAIL_SERVICE_PORT
       - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://${OTEL_COLLECTOR_HOST}:${OTEL_COLLECTOR_PORT_HTTP}/v1/traces
       - OTEL_RESOURCE_ATTRIBUTES
-      - OTEL_SERVICE_NAME=emailservice
+      - OTEL_SERVICE_NAME=bugsnag-otel-demo-emailservice
     depends_on:
       otelcol:
         condition: service_started
@@ -238,7 +238,7 @@ services:
       - OTEL_INSTRUMENTATION_KAFKA_EXPERIMENTAL_SPAN_ATTRIBUTES=true
       - OTEL_INSTRUMENTATION_MESSAGING_EXPERIMENTAL_RECEIVE_TELEMETRY_ENABLED=true
       - OTEL_RESOURCE_ATTRIBUTES
-      - OTEL_SERVICE_NAME=frauddetectionservice
+      - OTEL_SERVICE_NAME=bugsnag-otel-demo-frauddetectionservice
     depends_on:
       otelcol:
         condition: service_started
@@ -275,10 +275,10 @@ services:
       - OTEL_EXPORTER_OTLP_ENDPOINT
       - OTEL_RESOURCE_ATTRIBUTES=${OTEL_RESOURCE_ATTRIBUTES}
       - ENV_PLATFORM
-      - OTEL_SERVICE_NAME=frontend
+      - OTEL_SERVICE_NAME=bugsnag-otel-demo-frontend
       - PUBLIC_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
       - OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
-      - WEB_OTEL_SERVICE_NAME=frontend-web
+      - WEB_OTEL_SERVICE_NAME=bugsnag-otel-demo-frontend-web
       - OTEL_COLLECTOR_HOST
       - FLAGD_HOST
       - FLAGD_PORT
@@ -370,7 +370,7 @@ services:
       - IMAGE_PROVIDER_PORT
       - OTEL_COLLECTOR_HOST
       - OTEL_COLLECTOR_PORT_GRPC
-      - OTEL_SERVICE_NAME=imageprovider
+      - OTEL_SERVICE_NAME=bugsnag-otel-demo-imageprovider
       - OTEL_RESOURCE_ATTRIBUTES
     depends_on:
       otelcol:
@@ -403,7 +403,7 @@ services:
       - OTEL_EXPORTER_OTLP_ENDPOINT
       - OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
       - OTEL_RESOURCE_ATTRIBUTES
-      - OTEL_SERVICE_NAME=loadgenerator
+      - OTEL_SERVICE_NAME=bugsnag-otel-demo-loadgenerator
       - PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
       - LOCUST_WEB_HOST=0.0.0.0
       - FLAGD_HOST
@@ -438,7 +438,7 @@ services:
       - OTEL_EXPORTER_OTLP_ENDPOINT
       - OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
       - OTEL_RESOURCE_ATTRIBUTES
-      - OTEL_SERVICE_NAME=paymentservice
+      - OTEL_SERVICE_NAME=bugsnag-otel-demo-paymentservice
     depends_on:
       otelcol:
         condition: service_started
@@ -469,7 +469,7 @@ services:
       - OTEL_EXPORTER_OTLP_ENDPOINT
       - OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
       - OTEL_RESOURCE_ATTRIBUTES
-      - OTEL_SERVICE_NAME=productcatalogservice
+      - OTEL_SERVICE_NAME=bugsnag-otel-demo-productcatalogservice
     depends_on:
       otelcol:
         condition: service_started
@@ -498,7 +498,7 @@ services:
       - OTEL_PHP_AUTOLOAD_ENABLED=true
       - QUOTE_SERVICE_PORT
       - OTEL_RESOURCE_ATTRIBUTES
-      - OTEL_SERVICE_NAME=quoteservice
+      - OTEL_SERVICE_NAME=bugsnag-otel-demo-quoteservice
       - OTEL_PHP_INTERNAL_METRICS_ENABLED=true
     depends_on:
       otelcol:
@@ -530,7 +530,7 @@ services:
       - OTEL_EXPORTER_OTLP_ENDPOINT
       - OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
       - OTEL_RESOURCE_ATTRIBUTES
-      - OTEL_SERVICE_NAME=recommendationservice
+      - OTEL_SERVICE_NAME=bugsnag-otel-demo-recommendationservice
       - PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
     depends_on:
       productcatalogservice:
@@ -562,7 +562,7 @@ services:
       - QUOTE_SERVICE_ADDR
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://${OTEL_COLLECTOR_HOST}:${OTEL_COLLECTOR_PORT_GRPC}
       - OTEL_RESOURCE_ATTRIBUTES
-      - OTEL_SERVICE_NAME=shippingservice
+      - OTEL_SERVICE_NAME=bugsnag-otel-demo-shippingservice
     depends_on:
       otelcol:
         condition: service_started
@@ -615,7 +615,7 @@ services:
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://${OTEL_COLLECTOR_HOST}:${OTEL_COLLECTOR_PORT_HTTP}
       - OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE
       - OTEL_RESOURCE_ATTRIBUTES
-      - OTEL_SERVICE_NAME=kafka
+      - OTEL_SERVICE_NAME=bugsnag-otel-demo-kafka
       - KAFKA_HEAP_OPTS=-Xmx400m -Xms400m
     healthcheck:
       test: nc -z kafka 9092
