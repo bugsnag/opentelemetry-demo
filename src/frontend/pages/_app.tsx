@@ -1,17 +1,21 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-import '../styles/globals.css';
+import BugsnagPerformance, { DefaultRoutingProvider } from '@bugsnag/browser-performance';
+import Bugsnag from '@bugsnag/js';
+// import BugsnagPluginReact from '@bugsnag/plugin-react';
+import { FlagdWebProvider } from '@openfeature/flagd-web-provider';
+import { OpenFeature, OpenFeatureProvider } from '@openfeature/react-sdk';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import App, { AppContext, AppProps } from 'next/app';
-import CurrencyProvider from '../providers/Currency.provider';
-import CartProvider from '../providers/Cart.provider';
 import { ThemeProvider } from 'styled-components';
-import Theme from '../styles/Theme';
 import SessionGateway from '../gateways/Session.gateway';
-import { OpenFeatureProvider, OpenFeature } from '@openfeature/react-sdk';
-import { FlagdWebProvider } from '@openfeature/flagd-web-provider';
-import BugsnagPerformance, { DefaultRoutingProvider } from '@bugsnag/browser-performance'
+import CartProvider from '../providers/Cart.provider';
+import CurrencyProvider from '../providers/Currency.provider';
+import '../styles/globals.css';
+import Theme from '../styles/Theme';
+// import ErrorBoundary from './ErrorBoundary';
+// import MyErrorBoundary from './MyErrorBoundary';
 
 declare global {
   interface Window {
@@ -27,37 +31,42 @@ declare global {
   }
 }
 
-const resolveRoute = function resolveRoute (url: URL): string {
-  const pathname = url.pathname
+const resolveRoute = function resolveRoute(url: URL): string {
+  const pathname = url.pathname;
 
   if (pathname.startsWith('/product')) {
-    return '/product/{product-id}'
+    return '/product/{product-id}';
   }
 
   if (pathname.startsWith('/api/products/')) {
-    return '/api/products/{product-id}'
+    return '/api/products/{product-id}';
   }
 
   if (pathname.startsWith('/cart/checkout/')) {
-    return '/cart/checkout/{order-id}'
+    return '/cart/checkout/{order-id}';
   }
 
-  return pathname
-}
+  return pathname;
+};
 
 if (typeof window !== 'undefined') {
+  Bugsnag.start({
+    apiKey: window.ENV.BUGSNAG_API_KEY,
+  });
+
   BugsnagPerformance.start({
     apiKey: window.ENV.BUGSNAG_API_KEY,
     appVersion: window.ENV.BUGSNAG_APP_VERSION,
     releaseStage: window.ENV.BUGSNAG_RELEASE_STAGE,
     serviceName: 'opentelemetry-demo-frontend',
     routingProvider: new DefaultRoutingProvider(resolveRoute),
-    networkRequestCallback: (requestInfo) => {
-      requestInfo.propagateTraceContext = true
-      return requestInfo
-    }
-  })
+    networkRequestCallback: requestInfo => {
+      requestInfo.propagateTraceContext = true;
+      return requestInfo;
+    },
+  });
 
+  console.log('test');
   if (window.location) {
     const session = SessionGateway.getSession();
 
@@ -71,7 +80,7 @@ if (typeof window !== 'undefined') {
       const useTLS = window.location.protocol === 'https:';
       let port = useTLS ? 443 : 80;
       if (window.location.port) {
-          port = parseInt(window.location.port, 10);
+        port = parseInt(window.location.port, 10);
       }
 
       OpenFeature.setProvider(

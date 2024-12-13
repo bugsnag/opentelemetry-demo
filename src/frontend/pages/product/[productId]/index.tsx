@@ -19,6 +19,7 @@ import AdProvider from '../../../providers/Ad.provider';
 import { useCart } from '../../../providers/Cart.provider';
 import * as S from '../../../styles/ProductDetail.styled';
 import { useCurrency } from '../../../providers/Currency.provider';
+import Bugsnag from '@bugsnag/js';
 
 const quantityOptions = new Array(10).fill(0).map((_, i) => i + 1);
 
@@ -58,6 +59,13 @@ const ProductDetail: NextPage = () => {
       quantity,
     });
     push('/cart');
+    Bugsnag.notify(new Error('uh oh!!!'), undefined, function (err, event) {
+      if (err) {
+        console.log('Failed to send report because of:\n' + err.stack);
+      } else {
+        console.log('Successfully sent report "' + event.errors[0].errorMessage + '"');
+      }
+    });
   }, [addItem, productId, quantity, push]);
 
   return (
