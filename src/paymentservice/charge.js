@@ -14,20 +14,14 @@ const meter = metrics.getMeter("paymentservice");
 const transactionsCounter = meter.createCounter("app.payment.transactions");
 const Bugsnag = require("@bugsnag/js");
 
-module.exports.charge = async (request) => {
-  const span = tracer.startSpan("charge");
+module.exports.charge = async request => {
+  const Bugsnag = require("@bugsnag/js");
+  const span = tracer.startSpan('charge');
 
   await OpenFeature.setProviderAndWait(flagProvider);
-  if (
-    await OpenFeature.getClient().getBooleanValue(
-      "paymentServiceFailure",
-      false
-    )
-  ) {
+  if (await OpenFeature.getClient().getBooleanValue("paymentServiceFailure", false)) {
     Bugsnag.notify(new Error("PaymentService Fail Feature Flag Enabled"));
-    console.log("Elol");
-
-    // throw new Error("PaymentService Fail Feature Flag Enabled");
+    throw new Error("PaymentService Fail Feature Flag Enabled");
   }
 
   const {

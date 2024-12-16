@@ -5,11 +5,10 @@ const protoLoader = require("@grpc/proto-loader");
 const health = require("grpc-js-health-check");
 const opentelemetry = require("@opentelemetry/api");
 
-const charge = require("./charge");
-const logger = require("./logger");
-const { trace, context } = require("@opentelemetry/api");
-const Bugsnag = require("@bugsnag/js");
-console.log(process.env.PAYMENT_SERVICE_BUGSNAG_API_KEY);
+const charge = require('./charge')
+const logger = require('./logger')
+const { trace, context } = require('@opentelemetry/api');
+const Bugsnag = require('@bugsnag/js');
 
 Bugsnag.start({
   apiKey: process.env.PAYMENT_SERVICE_BUGSNAG_API_KEY,
