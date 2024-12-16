@@ -3,7 +3,6 @@
 
 import BugsnagPerformance, { DefaultRoutingProvider } from '@bugsnag/browser-performance';
 import Bugsnag from '@bugsnag/js';
-// import BugsnagPluginReact from '@bugsnag/plugin-react';
 import { FlagdWebProvider } from '@openfeature/flagd-web-provider';
 import { OpenFeature, OpenFeatureProvider } from '@openfeature/react-sdk';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -14,8 +13,6 @@ import CartProvider from '../providers/Cart.provider';
 import CurrencyProvider from '../providers/Currency.provider';
 import '../styles/globals.css';
 import Theme from '../styles/Theme';
-// import ErrorBoundary from './ErrorBoundary';
-// import MyErrorBoundary from './MyErrorBoundary';
 
 declare global {
   interface Window {
@@ -60,13 +57,13 @@ if (typeof window !== 'undefined') {
     releaseStage: window.ENV.BUGSNAG_RELEASE_STAGE,
     serviceName: 'opentelemetry-demo-frontend',
     routingProvider: new DefaultRoutingProvider(resolveRoute),
-    networkRequestCallback: requestInfo => {
-      requestInfo.propagateTraceContext = true;
-      return requestInfo;
+    networkRequestCallback: networkRequestInfo => {
+      networkRequestInfo.propagateTraceContext = networkRequestInfo.url?.startsWith(window.origin);
+
+      return networkRequestInfo;
     },
   });
 
-  console.log('test');
   if (window.location) {
     const session = SessionGateway.getSession();
 

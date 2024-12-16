@@ -7,15 +7,7 @@ import Bugsnag from '@bugsnag/js';
 
 const Banner = () => {
   const onButtonClick = () => {
-    console.log('button pressed');
-    Bugsnag.notify(new Error('Test error 2'));
-    Bugsnag.notify(new Error('Test error 3'), undefined, function (err, event) {
-      if (err) {
-        console.log('Failed to send report because of:\n' + err.stack);
-      } else {
-        console.log('Successfully sent report "' + event.errors[0].errorMessage + '"');
-      }
-    });
+    Bugsnag.notify(new Error('Test error'));
   };
 
   return (
