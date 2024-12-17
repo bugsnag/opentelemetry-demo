@@ -21,7 +21,7 @@ declare global {
       NEXT_PUBLIC_OTEL_SERVICE_NAME?: string;
       NEXT_PUBLIC_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT?: string;
       IS_SYNTHETIC_REQUEST?: string;
-      FRONTEND_BUGSNAG_API_KEY: string;
+      BUGSNAG_API_KEY: string;
       BUGSNAG_APP_VERSION: string;
       BUGSNAG_RELEASE_STAGE: string;
     };
@@ -48,11 +48,11 @@ const resolveRoute = function resolveRoute (url: URL): string {
 
 if (typeof window !== 'undefined') {
   Bugsnag.start({
-    apiKey: window.ENV.FRONTEND_BUGSNAG_API_KEY,
+    apiKey: window.ENV.BUGSNAG_API_KEY,
   });
 
   BugsnagPerformance.start({
-    apiKey: window.ENV.FRONTEND_BUGSNAG_API_KEY,
+    apiKey: window.ENV.BUGSNAG_API_KEY,
     appVersion: window.ENV.BUGSNAG_APP_VERSION,
     releaseStage: window.ENV.BUGSNAG_RELEASE_STAGE,
     serviceName: 'opentelemetry-demo-frontend',
@@ -77,7 +77,7 @@ if (typeof window !== 'undefined') {
       const useTLS = window.location.protocol === 'https:';
       let port = useTLS ? 443 : 80;
       if (window.location.port) {
-          port = parseInt(window.location.port, 10);
+        port = parseInt(window.location.port, 10);
       }
 
       OpenFeature.setProvider(
