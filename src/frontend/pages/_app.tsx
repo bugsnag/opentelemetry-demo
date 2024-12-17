@@ -1,18 +1,18 @@
 // Copyright The OpenTelemetry Authors
 // SPDX-License-Identifier: Apache-2.0
 
-import BugsnagPerformance, { DefaultRoutingProvider } from '@bugsnag/browser-performance';
-import Bugsnag from '@bugsnag/js';
-import { FlagdWebProvider } from '@openfeature/flagd-web-provider';
-import { OpenFeature, OpenFeatureProvider } from '@openfeature/react-sdk';
+import '../styles/globals.css';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import App, { AppContext, AppProps } from 'next/app';
-import { ThemeProvider } from 'styled-components';
-import SessionGateway from '../gateways/Session.gateway';
-import CartProvider from '../providers/Cart.provider';
 import CurrencyProvider from '../providers/Currency.provider';
-import '../styles/globals.css';
+import CartProvider from '../providers/Cart.provider';
+import { ThemeProvider } from 'styled-components';
 import Theme from '../styles/Theme';
+import SessionGateway from '../gateways/Session.gateway';
+import { OpenFeatureProvider, OpenFeature } from '@openfeature/react-sdk';
+import { FlagdWebProvider } from '@openfeature/flagd-web-provider';
+import BugsnagPerformance, { DefaultRoutingProvider } from '@bugsnag/browser-performance';
+import Bugsnag from '@bugsnag/js';
 
 declare global {
   interface Window {
@@ -28,23 +28,23 @@ declare global {
   }
 }
 
-const resolveRoute = function resolveRoute(url: URL): string {
-  const pathname = url.pathname;
+const resolveRoute = function resolveRoute (url: URL): string {
+  const pathname = url.pathname
 
   if (pathname.startsWith('/product')) {
-    return '/product/{product-id}';
+    return '/product/{product-id}'
   }
 
   if (pathname.startsWith('/api/products/')) {
-    return '/api/products/{product-id}';
+    return '/api/products/{product-id}'
   }
 
   if (pathname.startsWith('/cart/checkout/')) {
-    return '/cart/checkout/{order-id}';
+    return '/cart/checkout/{order-id}'
   }
 
-  return pathname;
-};
+  return pathname
+}
 
 if (typeof window !== 'undefined') {
   Bugsnag.start({
@@ -77,7 +77,7 @@ if (typeof window !== 'undefined') {
       const useTLS = window.location.protocol === 'https:';
       let port = useTLS ? 443 : 80;
       if (window.location.port) {
-        port = parseInt(window.location.port, 10);
+          port = parseInt(window.location.port, 10);
       }
 
       OpenFeature.setProvider(
