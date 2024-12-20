@@ -3,8 +3,13 @@
 
 import Link from 'next/link';
 import * as S from './Banner.styled';
+import Bugsnag from '@bugsnag/js';
 
 const Banner = () => {
+  const onButtonClick = () => {
+    Bugsnag.notify(new Error('Test error'));
+  };
+
   return (
     <S.Banner>
       <S.ImageContainer>
@@ -12,7 +17,9 @@ const Banner = () => {
       </S.ImageContainer>
       <S.TextContainer>
         <S.Title>The best telescopes to see the world closer</S.Title>
-        <Link href="#hot-products"><S.GoShoppingButton>Go Shopping</S.GoShoppingButton></Link>
+        <Link href="#hot-products" onClick={onButtonClick}>
+          <S.GoShoppingButton>Go Shopping</S.GoShoppingButton>
+        </Link>
       </S.TextContainer>
     </S.Banner>
   );
