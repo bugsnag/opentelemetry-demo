@@ -30,7 +30,6 @@ import (
 	"go.opentelemetry.io/otel"
 	otelcodes "go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetricgrpc"
-	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/propagation"
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
 	sdkresource "go.opentelemetry.io/otel/sdk/resource"
@@ -45,6 +44,9 @@ import (
 	pb "github.com/open-telemetry/opentelemetry-demo/src/checkoutservice/genproto/oteldemo"
 	"github.com/open-telemetry/opentelemetry-demo/src/checkoutservice/kafka"
 	"github.com/open-telemetry/opentelemetry-demo/src/checkoutservice/money"
+
+	bugsnagperformance "github.com/bugsnag/bugsnag-go-performance"
+	"github.com/bugsnag/bugsnag-go/v2"
 )
 
 //go:generate go install google.golang.org/protobuf/cmd/protoc-gen-go
@@ -87,19 +89,19 @@ func initResource() *sdkresource.Resource {
 	return resource
 }
 
-func initTracerProvider() *sdktrace.TracerProvider {
-	ctx := context.Background()
+func initTracerProvider(apiKey string, releaseStage string, appVersion string) *sdktrace.TracerProvider {
+	bugsnagOptions, err := bugsnagperformance.Configure(bugsnagperformance.Configuration{
+        APIKey:          apiKey,
+        AppVersion:      appVersion,
+        ReleaseStage:    releaseStage,
+    })
 
-	exporter, err := otlptracegrpc.New(ctx)
-	if err != nil {
-		log.Fatalf("new otlp trace grpc exporter failed: %v", err)
-	}
-	tp := sdktrace.NewTracerProvider(
-		sdktrace.WithBatcher(exporter),
-		sdktrace.WithResource(initResource()),
-	)
-	otel.SetTracerProvider(tp)
-	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
+    if err != nil {
+        fmt.Printf("Error configuring bugsnag-go-performance: %+v\n", err)
+    }
+
+    tp := sdktrace.NewTracerProvider(bugsnagOptions...)
+    otel.SetTracerProvider(tp)
 	return tp
 }
 
@@ -138,10 +140,25 @@ type checkoutService struct {
 }
 
 func main() {
+	var apiKey string
+	mustMapEnv(&apiKey, "BUGSNAG_API_KEY")
+	var releaseStage string
+	mustMapEnv(&releaseStage, "BUGSNAG_RELEASE_STAGE")
+	var appVersion string
+	mustMapEnv(&appVersion, "BUGSNAG_APP_VERSION")
+
+	bugsnag.Configure(bugsnag.Configuration{
+        APIKey:          apiKey,
+        ReleaseStage:    releaseStage,
+        ProjectPackages: []string{"main", "github.com/org/myapp"},
+    })
+
+	bugsnag.Notify(fmt.Errorf("Test error"))
+
 	var port string
 	mustMapEnv(&port, "CHECKOUT_SERVICE_PORT")
 
-	tp := initTracerProvider()
+	tp := initTracerProvider(apiKey, releaseStage, appVersion)
 	defer func() {
 		if err := tp.Shutdown(context.Background()); err != nil {
 			log.Printf("Error shutting down tracer provider: %v", err)
