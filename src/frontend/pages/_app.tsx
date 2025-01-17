@@ -13,7 +13,6 @@ import { OpenFeatureProvider, OpenFeature } from '@openfeature/react-sdk';
 import { FlagdWebProvider } from '@openfeature/flagd-web-provider';
 import BugsnagPerformance, { DefaultRoutingProvider } from '@bugsnag/browser-performance';
 import Bugsnag from '@bugsnag/js';
-import { trace, context } from '@opentelemetry/api';
 
 declare global {
   interface Window {
@@ -50,20 +49,12 @@ const resolveRoute = function resolveRoute (url: URL): string {
 if (typeof window !== 'undefined') {
   Bugsnag.start({
     apiKey: window.ENV.BUGSNAG_API_KEY,
-    onError: function (event) {
-      const spanContext = trace.getSpanContext(context.active());
-      event.addMetadata('correlation', {
-        traceId: spanContext?.traceId,
-        spanId: spanContext?.spanId,
-      });
-    },
   });
 
   BugsnagPerformance.start({
     apiKey: window.ENV.BUGSNAG_API_KEY,
     appVersion: window.ENV.BUGSNAG_APP_VERSION,
     releaseStage: window.ENV.BUGSNAG_RELEASE_STAGE,
-    bugsnag: Bugsnag,
     serviceName: 'opentelemetry-demo-frontend',
     routingProvider: new DefaultRoutingProvider(resolveRoute),
     networkRequestCallback: networkRequestInfo => {
