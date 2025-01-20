@@ -102,6 +102,9 @@ func initTracerProvider(apiKey string, releaseStage string, appVersion string) *
 
     tp := sdktrace.NewTracerProvider(bugsnagOptions...)
     otel.SetTracerProvider(tp)
+
+	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
+
 	return tp
 }
 
@@ -153,8 +156,6 @@ func main() {
         ProjectPackages: []string{"main", "github.com/org/myapp"},
     })
 
-	bugsnag.Notify(fmt.Errorf("Test error"))
-
 	var port string
 	mustMapEnv(&port, "CHECKOUT_SERVICE_PORT")
 
@@ -171,6 +172,16 @@ func main() {
 			log.Printf("Error shutting down meter provider: %v", err)
 		}
 	}()
+
+	ctx := context.Background()
+	traceCtx := trace.SpanContextFromContext(ctx)
+	newErr := fmt.Errorf("new error")
+	bugsnag.Notify(newErr, ctx, bugsnag.MetaData{
+		"correlation": {
+			"traceId":     traceCtx.TraceID().String(),
+			"spanId":     traceCtx.SpanID().String(),
+		},
+	})
 
 	err := runtime.Start(runtime.WithMinimumReadMemStatsInterval(time.Second))
 	if err != nil {
