@@ -56,6 +56,7 @@ if (typeof window !== 'undefined') {
     appVersion: window.ENV.BUGSNAG_APP_VERSION,
     releaseStage: window.ENV.BUGSNAG_RELEASE_STAGE,
     serviceName: 'opentelemetry-demo-frontend',
+    bugsnag: Bugsnag,
     routingProvider: new DefaultRoutingProvider(resolveRoute),
     networkRequestCallback: networkRequestInfo => {
       networkRequestInfo.propagateTraceContext = networkRequestInfo.url?.startsWith(window.origin);
