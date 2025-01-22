@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -153,7 +154,7 @@ func main() {
 	bugsnag.Configure(bugsnag.Configuration{
         APIKey:          apiKey,
         ReleaseStage:    releaseStage,
-        ProjectPackages: []string{"main", "github.com/org/myapp"},
+        ProjectPackages: []string{"main", "github.com/bugsnag/opentelemetry-demo"},
     })
 
 	var port string
@@ -173,22 +174,16 @@ func main() {
 		}
 	}()
 
-	ctx := context.Background()
-	traceCtx := trace.SpanContextFromContext(ctx)
-	newErr := fmt.Errorf("new error")
-	bugsnag.Notify(newErr, ctx, bugsnag.MetaData{
-		"correlation": {
-			"traceId":     traceCtx.TraceID().String(),
-			"spanId":     traceCtx.SpanID().String(),
-		},
-	})
-
-	err := runtime.Start(runtime.WithMinimumReadMemStatsInterval(time.Second))
+	err := openfeature.SetProvider(flagd.NewProvider())
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	openfeature.SetProvider(flagd.NewProvider())
+	err = runtime.Start(runtime.WithMinimumReadMemStatsInterval(time.Second))
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	openfeature.AddHooks(otelhooks.NewTracesHook())
 
 	tracer = tp.Tracer("checkoutservice")
@@ -269,6 +264,7 @@ func (cs *checkoutService) Watch(req *healthpb.HealthCheckRequest, ws healthpb.H
 
 func (cs *checkoutService) PlaceOrder(ctx context.Context, req *pb.PlaceOrderRequest) (*pb.PlaceOrderResponse, error) {
 	span := trace.SpanFromContext(ctx)
+	traceCtx := trace.SpanContextFromContext(ctx)
 	span.SetAttributes(
 		attribute.String("app.user.id", req.UserId),
 		attribute.String("app.user.currency", req.UserCurrency),
@@ -279,8 +275,22 @@ func (cs *checkoutService) PlaceOrder(ctx context.Context, req *pb.PlaceOrderReq
 	defer func() {
 		if err != nil {
 			span.AddEvent("error", trace.WithAttributes(semconv.ExceptionMessageKey.String(err.Error())))
+			bugsnag.Notify(err, ctx, bugsnag.MetaData{
+				"correlation": {
+					"traceId":     traceCtx.TraceID().String(),
+					"spanId":     traceCtx.SpanID().String(),
+				},
+			})
 		}
 	}()
+
+	if cs.checkoutFailure(ctx) {
+		msg := fmt.Sprintf("Error: CheckoutService Fail Feature Flag Enabled")
+		span.SetStatus(otelcodes.Error, msg)
+		span.AddEvent(msg)
+		err = errors.New(msg)
+		return nil, status.Errorf(codes.Internal, msg, err)
+	}
 
 	orderID, err := uuid.NewUUID()
 	if err != nil {
@@ -636,4 +646,13 @@ func (cs *checkoutService) getIntFeatureFlag(ctx context.Context, featureFlagNam
 	)
 
 	return int(featureFlagValue)
+}
+
+func (cs *checkoutService) checkoutFailure(ctx context.Context) bool {
+	openfeature.AddHooks(otelhooks.NewTracesHook())
+	client := openfeature.NewClient("checkout")
+	failureEnabled, _ := client.BooleanValue(
+		ctx, "checkoutServiceFailure", false, openfeature.EvaluationContext{},
+	)
+	return failureEnabled
 }
