@@ -538,6 +538,15 @@ data:
           },
           "defaultVariant": "off"
         },
+        "checkoutServiceFailure": {
+          "description": "Fail checkout service",
+          "state": "ENABLED",
+          "variants": {
+            "on": true,
+            "off": false
+          },
+          "defaultVariant": "off"
+        },
         "paymentServiceFailure": {
           "description": "Fail payment service charge requests",
           "state": "ENABLED",
