@@ -237,6 +237,7 @@ func main() {
 	}
 
 	var srv = grpc.NewServer(
+		grpc.UnaryInterceptor(BugsnagErrorInterceptor()),
 		grpc.StatsHandler(otelgrpc.NewServerHandler()),
 	)
 	pb.RegisterCheckoutServiceServer(srv, svc)
@@ -254,13 +255,21 @@ func mustMapEnv(target *string, envKey string) {
 	*target = v
 }
 
-func NotifyWithTraceCtx(ctx context.Context, err error) {
-	traceCtx := trace.SpanContextFromContext(ctx)
-	bugsnag.Notify(err, ctx, bugsnag.MetaData{
-		"correlation": {
-			"traceId":     traceCtx.TraceID().String(),
-			"spanId":     traceCtx.SpanID().String(),
-		},
+// BugsnagErrorInterceptor send error to bugsnag
+func BugsnagErrorInterceptor() grpc.UnaryServerInterceptor {
+	return grpc.UnaryServerInterceptor(func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+		traceCtx := trace.SpanContextFromContext(ctx)
+		resp, err := handler(ctx, req)
+		if err != nil {
+			bugsnag.Notify(err, ctx, bugsnag.MetaData{
+				"correlation": {
+					"traceId":     traceCtx.TraceID().String(),
+					"spanId":     traceCtx.SpanID().String(),
+				},
+			})
+		}
+
+		return resp, err
 	})
 }
 
@@ -284,7 +293,6 @@ func (cs *checkout) PlaceOrder(ctx context.Context, req *pb.PlaceOrderRequest) (
 	defer func() {
 		if err != nil {
 			span.AddEvent("error", trace.WithAttributes(semconv.ExceptionMessageKey.String(err.Error())))
-			NotifyWithTraceCtx(ctx, err)
 		}
 	}()
 
@@ -379,13 +387,6 @@ func (cs *checkout) prepareOrderItemsAndShippingQuoteFromCart(ctx context.Contex
 	ctx, span := tracer.Start(ctx, "prepareOrderItemsAndShippingQuoteFromCart")
 	defer span.End()
 
-	var err error
-	defer func() {
-		if err != nil {
-			NotifyWithTraceCtx(ctx, err)
-		}
-	}()
-
 	var out orderPrep
 	cartItems, err := cs.getUserCart(ctx, userID)
 	if err != nil {
@@ -440,7 +441,6 @@ func (cs *checkout) quoteShipping(ctx context.Context, address *pb.Address, item
 			Address: address,
 			Items:   items})
 	if err != nil {
-		NotifyWithTraceCtx(ctx, err)
 		return nil, fmt.Errorf("failed to get shipping quote: %+v", err)
 	}
 	return shippingQuote.GetCostUsd(), nil
@@ -449,7 +449,6 @@ func (cs *checkout) quoteShipping(ctx context.Context, address *pb.Address, item
 func (cs *checkout) getUserCart(ctx context.Context, userID string) ([]*pb.CartItem, error) {
 	cart, err := cs.cartSvcClient.GetCart(ctx, &pb.GetCartRequest{UserId: userID})
 	if err != nil {
-		NotifyWithTraceCtx(ctx, err)
 		return nil, fmt.Errorf("failed to get user cart during checkout: %+v", err)
 	}
 	return cart.GetItems(), nil
@@ -457,7 +456,6 @@ func (cs *checkout) getUserCart(ctx context.Context, userID string) ([]*pb.CartI
 
 func (cs *checkout) emptyUserCart(ctx context.Context, userID string) error {
 	if _, err := cs.cartSvcClient.EmptyCart(ctx, &pb.EmptyCartRequest{UserId: userID}); err != nil {
-		NotifyWithTraceCtx(ctx, err)
 		return fmt.Errorf("failed to empty user cart during checkout: %+v", err)
 	}
 	return nil
@@ -465,13 +463,6 @@ func (cs *checkout) emptyUserCart(ctx context.Context, userID string) error {
 
 func (cs *checkout) prepOrderItems(ctx context.Context, items []*pb.CartItem, userCurrency string) ([]*pb.OrderItem, error) {
 	out := make([]*pb.OrderItem, len(items))
-
-	var err error
-	defer func() {
-		if err != nil {
-			NotifyWithTraceCtx(ctx, err)
-		}
-	}()
 
 	for i, item := range items {
 		product, err := cs.productCatalogSvcClient.GetProduct(ctx, &pb.GetProductRequest{Id: item.GetProductId()})
@@ -495,7 +486,6 @@ func (cs *checkout) convertCurrency(ctx context.Context, from *pb.Money, toCurre
 		ToCode: toCurrency})
 	if err != nil {
 		return nil, fmt.Errorf("failed to convert currency: %+v", err)
-		NotifyWithTraceCtx(ctx, err)
 	}
 	return result, err
 }
@@ -512,20 +502,12 @@ func (cs *checkout) chargeCard(ctx context.Context, amount *pb.Money, paymentInf
 		Amount:     amount,
 		CreditCard: paymentInfo})
 	if err != nil {
-		NotifyWithTraceCtx(ctx, err)
 		return "", fmt.Errorf("could not charge the card: %+v", err)
 	}
 	return paymentResp.GetTransactionId(), nil
 }
 
 func (cs *checkout) sendOrderConfirmation(ctx context.Context, email string, order *pb.OrderResult) error {
-	var err error
-	defer func() {
-		if err != nil {
-			NotifyWithTraceCtx(ctx, err)
-		}
-	}()
-
 	emailPayload, err := json.Marshal(map[string]interface{}{
 		"email": email,
 		"order": order,
@@ -552,7 +534,6 @@ func (cs *checkout) shipOrder(ctx context.Context, address *pb.Address, items []
 		Address: address,
 		Items:   items})
 	if err != nil {
-		NotifyWithTraceCtx(ctx, err)
 		return "", fmt.Errorf("shipment failed: %+v", err)
 	}
 	return resp.GetTrackingId(), nil
@@ -562,7 +543,6 @@ func (cs *checkout) sendToPostProcessor(ctx context.Context, result *pb.OrderRes
 	message, err := proto.Marshal(result)
 	if err != nil {
 		log.Errorf("Failed to marshal message to protobuf: %+v", err)
-		NotifyWithTraceCtx(ctx, err)
 		return
 	}
 
