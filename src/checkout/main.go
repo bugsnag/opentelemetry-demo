@@ -297,7 +297,7 @@ func (cs *checkout) PlaceOrder(ctx context.Context, req *pb.PlaceOrderRequest) (
 	}()
 
 	if cs.checkoutFailure(ctx) {
-		msg := fmt.Sprintf("Error: CheckoutService Fail Feature Flag Enabled")
+		msg := fmt.Sprintf("Error: Checkout Fail Feature Flag Enabled")
 		span.SetStatus(otelcodes.Error, msg)
 		span.AddEvent(msg)
 		err = errors.New(msg)
