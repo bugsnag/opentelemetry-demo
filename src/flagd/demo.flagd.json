@@ -64,7 +64,7 @@
       },
       "defaultVariant": "off"
     },
-    "checkoutServiceFailure": {
+    "checkoutFailure": {
       "description": "Fail checkout service",
       "state": "ENABLED",
       "variants": {
