@@ -10,7 +10,7 @@ import CartProvider from '../providers/Cart.provider';
 import { ThemeProvider } from 'styled-components';
 import Theme from '../styles/Theme';
 import SessionGateway from '../gateways/Session.gateway';
-import { OpenFeature } from '@openfeature/react-sdk';
+import { OpenFeature, OpenFeatureProvider } from '@openfeature/react-sdk';
 import { FlagdWebProvider } from '@openfeature/flagd-web-provider';
 import BugsnagPerformance, { DefaultRoutingProvider } from '@bugsnag/browser-performance';
 import Bugsnag from '@bugsnag/js';
@@ -63,6 +63,12 @@ if (typeof window !== 'undefined') {
     batchInactivityTimeoutMs: 1000,
     routingProvider: new DefaultRoutingProvider(resolveRoute),
     networkRequestCallback: (networkRequestInfo: any) => {
+
+      console.log('networkRequestInfo.url', networkRequestInfo.url);
+      // Ignore the event stream request
+      if (networkRequestInfo.url.endsWith('flagd.evaluation.v1.Service/EventStream')) {
+        return null;
+      }
       networkRequestInfo.propagateTraceContext = networkRequestInfo.url?.startsWith(window.origin);
       return networkRequestInfo;
     }
@@ -106,13 +112,15 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ErrorBoundary>
       <ThemeProvider theme={Theme}>
-        <QueryClientProvider client={queryClient}>
-          <CurrencyProvider>
-            <CartProvider>
-              <Component {...pageProps} />
-            </CartProvider>
-          </CurrencyProvider>
-        </QueryClientProvider>
+        <OpenFeatureProvider>
+          <QueryClientProvider client={queryClient}>
+            <CurrencyProvider>
+              <CartProvider>
+                <Component {...pageProps} />
+              </CartProvider>
+            </CurrencyProvider>
+          </QueryClientProvider>
+        </OpenFeatureProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );
