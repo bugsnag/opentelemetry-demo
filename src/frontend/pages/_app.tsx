@@ -10,7 +10,7 @@ import CartProvider from '../providers/Cart.provider';
 import { ThemeProvider } from 'styled-components';
 import Theme from '../styles/Theme';
 import SessionGateway from '../gateways/Session.gateway';
-import { OpenFeature, OpenFeatureProvider } from '@openfeature/react-sdk';
+import { OpenFeatureProvider, OpenFeature } from '@openfeature/react-sdk';
 import { FlagdWebProvider } from '@openfeature/flagd-web-provider';
 import BugsnagPerformance, { DefaultRoutingProvider } from '@bugsnag/browser-performance';
 import Bugsnag from '@bugsnag/js';
@@ -63,9 +63,6 @@ if (typeof window !== 'undefined') {
     batchInactivityTimeoutMs: 1000,
     routingProvider: new DefaultRoutingProvider(resolveRoute),
     networkRequestCallback: (networkRequestInfo: any) => {
-
-      console.log('networkRequestInfo.url', networkRequestInfo.url);
-      // Ignore the event stream request
       if (networkRequestInfo.url.endsWith('flagd.evaluation.v1.Service/EventStream')) {
         return null;
       }
@@ -95,7 +92,9 @@ if (typeof window !== 'undefined') {
           host: window.location.hostname,
           pathPrefix: 'flagservice',
           port: port,
-          tls: useTLS
+          tls: useTLS,
+          maxRetries: 3,
+          maxDelay: 10000,
         })
       );
     });

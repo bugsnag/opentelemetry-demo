@@ -6,8 +6,7 @@ import { Product } from '../../protos/demo';
 import ProductPrice from '../ProductPrice';
 import * as S from './ProductCard.styled';
 import { useState, useEffect } from 'react';
-import { OpenFeature, useNumberFlagValue } from '@openfeature/react-sdk';
-
+import { useNumberFlagValue } from '@openfeature/react-sdk';
 
 interface IProps {
   product: Product;
@@ -30,9 +29,9 @@ const ProductCard = ({
     },
   },
 }: IProps) => {
-  const [imageSrc, setImageSrc] = useState<string>('');
   const imageSlowLoad = useNumberFlagValue('imageSlowLoad', 0);
-  
+  const [imageSrc, setImageSrc] = useState<string>('');
+
   useEffect(() => {
     const headers = new Headers();
     headers.append('x-envoy-fault-delay-request', imageSlowLoad.toString());
