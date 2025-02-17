@@ -51,7 +51,8 @@ if (typeof window !== 'undefined') {
     apiKey: window.ENV.BUGSNAG_API_KEY,
     plugins: [new BugsnagPluginReact()],
   });
-  const options = {
+  
+  BugsnagPerformance.start({
     apiKey: window.ENV.BUGSNAG_API_KEY,
     appVersion: window.ENV.BUGSNAG_APP_VERSION,
     releaseStage: window.ENV.BUGSNAG_RELEASE_STAGE,
@@ -62,8 +63,7 @@ if (typeof window !== 'undefined') {
       networkRequestInfo.propagateTraceContext = networkRequestInfo.url?.startsWith(window.origin);
       return networkRequestInfo;
     }
-  } as any;
-  BugsnagPerformance.start(options);
+  } as any);
 }
 
 const queryClient = new QueryClient();
