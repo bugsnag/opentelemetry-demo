@@ -10,7 +10,7 @@ import CartProvider from '../providers/Cart.provider';
 import { ThemeProvider } from 'styled-components';
 import Theme from '../styles/Theme';
 import SessionGateway from '../gateways/Session.gateway';
-import { OpenFeatureProvider, OpenFeature } from '@openfeature/react-sdk';
+import { OpenFeature } from '@openfeature/react-sdk';
 import { FlagdWebProvider } from '@openfeature/flagd-web-provider';
 import BugsnagPerformance, { DefaultRoutingProvider } from '@bugsnag/browser-performance';
 import Bugsnag from '@bugsnag/js';
@@ -106,15 +106,13 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ErrorBoundary>
       <ThemeProvider theme={Theme}>
-        <OpenFeatureProvider>
-          <QueryClientProvider client={queryClient}>
-            <CurrencyProvider>
-              <CartProvider>
-                <Component {...pageProps} />
-              </CartProvider>
-            </CurrencyProvider>
-          </QueryClientProvider>
-        </OpenFeatureProvider>
+        <QueryClientProvider client={queryClient}>
+          <CurrencyProvider>
+            <CartProvider>
+              <Component {...pageProps} />
+            </CartProvider>
+          </CurrencyProvider>
+        </QueryClientProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );
