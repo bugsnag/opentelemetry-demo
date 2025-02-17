@@ -9,6 +9,9 @@ import CurrencyProvider from '../providers/Currency.provider';
 import CartProvider from '../providers/Cart.provider';
 import { ThemeProvider } from 'styled-components';
 import Theme from '../styles/Theme';
+import SessionGateway from '../gateways/Session.gateway';
+import { OpenFeatureProvider, OpenFeature } from '@openfeature/react-sdk';
+import { FlagdWebProvider } from '@openfeature/flagd-web-provider';
 import BugsnagPerformance, { DefaultRoutingProvider } from '@bugsnag/browser-performance';
 import Bugsnag from '@bugsnag/js';
 import BugsnagPluginReact from '@bugsnag/plugin-react';
@@ -51,7 +54,7 @@ if (typeof window !== 'undefined') {
     apiKey: window.ENV.BUGSNAG_API_KEY,
     plugins: [new BugsnagPluginReact()],
   });
-  
+
   BugsnagPerformance.start({
     apiKey: window.ENV.BUGSNAG_API_KEY,
     appVersion: window.ENV.BUGSNAG_APP_VERSION,
@@ -64,7 +67,35 @@ if (typeof window !== 'undefined') {
       return networkRequestInfo;
     }
   } as any);
+
+  if (window.location) {
+    const session = SessionGateway.getSession();
+
+    // Set context prior to provider init to avoid multiple http calls
+    OpenFeature.setContext({ targetingKey: session.userId, ...session }).then(() => {
+      /**
+       * We connect to flagd through the envoy proxy, straight from the browser,
+       * for this we need to know the current hostname and port.
+       */
+
+      const useTLS = window.location.protocol === 'https:';
+      let port = useTLS ? 443 : 80;
+      if (window.location.port) {
+        port = parseInt(window.location.port, 10);
+      }
+
+      OpenFeature.setProvider(
+        new FlagdWebProvider({
+          host: window.location.hostname,
+          pathPrefix: 'flagservice',
+          port: port,
+          tls: useTLS
+        })
+      );
+    });
+  }
 }
+
 
 const queryClient = new QueryClient();
 
@@ -75,13 +106,15 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ErrorBoundary>
       <ThemeProvider theme={Theme}>
-        <QueryClientProvider client={queryClient}>
-          <CurrencyProvider>
-            <CartProvider>
-              <Component {...pageProps} />
-            </CartProvider>
-          </CurrencyProvider>
-        </QueryClientProvider>
+        <OpenFeatureProvider>
+          <QueryClientProvider client={queryClient}>
+            <CurrencyProvider>
+              <CartProvider>
+                <Component {...pageProps} />
+              </CartProvider>
+            </CurrencyProvider>
+          </QueryClientProvider>
+        </OpenFeatureProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );

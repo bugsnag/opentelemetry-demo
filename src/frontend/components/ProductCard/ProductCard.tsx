@@ -6,6 +6,8 @@ import { Product } from '../../protos/demo';
 import ProductPrice from '../ProductPrice';
 import * as S from './ProductCard.styled';
 import { useState, useEffect } from 'react';
+import { OpenFeature } from '@openfeature/react-sdk';
+
 
 interface IProps {
   product: Product;
@@ -29,9 +31,10 @@ const ProductCard = ({
   },
 }: IProps) => {
   const [imageSrc, setImageSrc] = useState<string>('');
-
   useEffect(() => {
     const headers = new Headers();
+    const imageSlowLoad = OpenFeature.getClient().getNumberValue('imageSlowLoad', 0);
+    headers.append('x-envoy-fault-delay-request', imageSlowLoad.toString());
     headers.append('Cache-Control', 'no-cache')
     const requestInit = {
       method: "GET",
