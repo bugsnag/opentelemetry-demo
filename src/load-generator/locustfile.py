@@ -192,7 +192,7 @@ if browser_traffic_enabled:
                 await page.route('**/*', add_baggage_header)
                 await page.goto("/cart", wait_until="domcontentloaded")
                 await page.select_option('[name="currency_code"]', 'CHF')
-                await page.wait_for_timeout(31000)  # giving the browser time to export the traces
+                await page.wait_for_timeout(5000)  # giving the browser time to export the traces
             except Exception as e:
                 print(f'Error while open_cart_page_and_change_currency: {e}')
                 pass
@@ -204,7 +204,7 @@ if browser_traffic_enabled:
                 page.on("console", lambda msg: print(f'goto_product_page console: {msg.text}'))
                 await page.route('**/*', add_baggage_header)
                 await page.goto("/product/" + random.choice(products), wait_until="domcontentloaded")
-                await page.wait_for_timeout(31000)  # giving the browser time to export the traces
+                await page.wait_for_timeout(5000)  # giving the browser time to export the traces
             except Exception as e:
                 print(f'Error while goto_product_page: {e}')
                 pass

@@ -31,7 +31,7 @@ declare global {
   }
 }
 
-const resolveRoute = function resolveRoute (url: URL): string {
+const resolveRoute = function resolveRoute(url: URL): string {
   const pathname = url.pathname
 
   if (pathname.startsWith('/product')) {
@@ -60,12 +60,16 @@ if (typeof window !== 'undefined') {
     appVersion: window.ENV.BUGSNAG_APP_VERSION,
     releaseStage: window.ENV.BUGSNAG_RELEASE_STAGE,
     bugsnag: Bugsnag,
+    batchInactivityTimeoutMs: 1000,
     routingProvider: new DefaultRoutingProvider(resolveRoute),
-    networkRequestCallback: networkRequestInfo => {
+    networkRequestCallback: (networkRequestInfo: any) => {
+      if (networkRequestInfo.url.endsWith('flagd.evaluation.v1.Service/EventStream')) {
+        return null;
+      }
       networkRequestInfo.propagateTraceContext = networkRequestInfo.url?.startsWith(window.origin);
       return networkRequestInfo;
-    },
-  });
+    }
+  } as any);
 
   if (window.location) {
     const session = SessionGateway.getSession();
@@ -80,7 +84,7 @@ if (typeof window !== 'undefined') {
       const useTLS = window.location.protocol === 'https:';
       let port = useTLS ? 443 : 80;
       if (window.location.port) {
-          port = parseInt(window.location.port, 10);
+        port = parseInt(window.location.port, 10);
       }
 
       OpenFeature.setProvider(
