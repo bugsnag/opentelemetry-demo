@@ -101,7 +101,6 @@ if (typeof window !== 'undefined') {
   }
 }
 
-
 const queryClient = new QueryClient();
 
 function MyApp({ Component, pageProps }: AppProps) {
