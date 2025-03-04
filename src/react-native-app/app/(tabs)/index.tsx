@@ -6,6 +6,21 @@ import { useQuery } from "@tanstack/react-query";
 import { ScrollView, StyleSheet } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import ApiGateway from "@/gateways/Api.gateway";
+import Bugsnag from "@bugsnag/expo";
+import BugsnagPerformance from "@bugsnag/react-native-performance";
+import React from "react";
+
+const apiKey = process.env.EXPO_PUBLIC_BUGSNAG_API_KEY as string;
+
+Bugsnag.start({ apiKey: apiKey });
+const ErrorBoundary = Bugsnag.getPlugin("react").createErrorBoundary(React);
+
+BugsnagPerformance.start({
+  apiKey: apiKey,
+  appVersion: process.env.EXPO_PUBLIC_BUGSNAG_APP_VERSION,
+  releaseStage: process.env.EXPO_PUBLIC_BUGSNAG_RELEASE_STAGE,
+  bugsnag: Bugsnag,
+});
 
 export default function Index() {
   const { data: productList = [] } = useQuery({
@@ -15,18 +30,20 @@ export default function Index() {
   });
 
   return (
-    <ThemedView style={styles.container}>
-      <ScrollView>
-        {productList.length ? (
-          <ProductList productList={productList} />
-        ) : (
-          <ThemedText>
-            No products found, make sure the backend services for the
-            OpenTelemetry demo are running
-          </ThemedText>
-        )}
-      </ScrollView>
-    </ThemedView>
+    <ErrorBoundary>
+      <ThemedView style={styles.container}>
+        <ScrollView>
+          {productList.length ? (
+            <ProductList productList={productList} />
+          ) : (
+            <ThemedText>
+              No products found, make sure the backend services for the
+              OpenTelemetry demo are running
+            </ThemedText>
+          )}
+        </ScrollView>
+      </ThemedView>
+    </ErrorBoundary>
   );
 }
 
