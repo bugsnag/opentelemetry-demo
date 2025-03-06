@@ -3,7 +3,7 @@
 import { ThemedView } from "@/components/ThemedView";
 import ProductList from "@/components/ProductList";
 import { useQuery } from "@tanstack/react-query";
-import { ScrollView, StyleSheet } from "react-native";
+import { AppRegistry, ScrollView, StyleSheet } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import ApiGateway from "@/gateways/Api.gateway";
 import Bugsnag from "@bugsnag/expo";
@@ -13,6 +13,7 @@ import React from "react";
 const apiKey = process.env.EXPO_PUBLIC_BUGSNAG_API_KEY as string;
 
 Bugsnag.start({ apiKey: apiKey });
+
 const ErrorBoundary = Bugsnag.getPlugin("react").createErrorBoundary(React);
 
 BugsnagPerformance.start({
@@ -20,9 +21,10 @@ BugsnagPerformance.start({
   appVersion: process.env.EXPO_PUBLIC_BUGSNAG_APP_VERSION,
   releaseStage: process.env.EXPO_PUBLIC_BUGSNAG_RELEASE_STAGE,
   bugsnag: Bugsnag,
+  autoInstrumentAppStarts: false,
 });
 
-export default function Index() {
+function Index() {
   const { data: productList = [] } = useQuery({
     // TODO simplify react native demo for now by hard-coding the selected currency
     queryKey: ["products", "USD"],
@@ -46,6 +48,8 @@ export default function Index() {
     </ErrorBoundary>
   );
 }
+
+export default BugsnagPerformance.withInstrumentedAppStarts(Index);
 
 const styles = StyleSheet.create({
   container: {
