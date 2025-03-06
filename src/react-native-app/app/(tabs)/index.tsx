@@ -3,7 +3,7 @@
 import { ThemedView } from "@/components/ThemedView";
 import ProductList from "@/components/ProductList";
 import { useQuery } from "@tanstack/react-query";
-import { AppRegistry, ScrollView, StyleSheet } from "react-native";
+import { ScrollView, StyleSheet } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import ApiGateway from "@/gateways/Api.gateway";
 import Bugsnag from "@bugsnag/expo";
