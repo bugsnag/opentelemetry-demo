@@ -102,18 +102,19 @@ can drag and drop this file onto the emulator's window in order to install it.
 
 ## BugsnagPerformance setup
 
-As Bugsnag currently not supporting Expo Apps for Performance monitoring it's 
-not possible to track Navigation spans. And to instrument AppStarts for this App 
-first we need to disable the autoInstrumentAppStarts configuration option of 
-BugsnagPerformance.start in index.tsx file. 
+As Bugsnag currently not supporting Expo Apps for Performance monitoring it's
+not possible to track Navigation spans. And to instrument AppStarts for this
+App first we need to disable the autoInstrumentAppStarts configuration option
+of BugsnagPerformance.start in index.tsx file.
 
 ```bash
-BugsnagPerformance.start({ 
+BugsnagPerformance.start({
   apiKey: 'YOUR_API_KEY',
   autoInstrumentAppStarts: false });
 ```
 
 Then wrap the App as follows:
+
 ```bash
 export default BugsnagPerformance.withInstrumentedAppStarts(Index);
 ```
