@@ -22,7 +22,7 @@ BugsnagPerformance.start({
   releaseStage: process.env.EXPO_PUBLIC_BUGSNAG_RELEASE_STAGE,
   bugsnag: Bugsnag,
   autoInstrumentAppStarts: false,
-  tracePropagationUrls: [/^(http(s)?(:\/\/))?(www\.)?(localhost)?(10.0.2.2)?(:[0-9]{4}\/)?([0-9A-Za-z-\\.@:%_\+~#=]+)(\.[a-zA-Z]{2,3})?(\/.*)?$/],
+  tracePropagationUrls: [/^(http(s)?(:\/\/))?(www\.)?([0-9A-Za-z-\\.@:%_\+~#=]+)(\.[a-zA-Z]{2,3})?(\/.*)?$/],
 });
 
 function Index() {
