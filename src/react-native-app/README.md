@@ -100,6 +100,26 @@ This will create a `react-native-app.apk` file in the directory where you ran
 the command. If you have an Android emulator running on your machine then you
 can drag and drop this file onto the emulator's window in order to install it.
 
+## BugsnagPerformance setup
+
+As Bugsnag currently not supporting Expo Apps for Performance monitoring it's
+not possible to track Navigation spans. To instrument AppStarts for this App
+first we need to disable the `autoInstrumentAppStarts` configuration option of
+`BugsnagPerformance.start` in `index.tsx` file.
+
+```js
+BugsnagPerformance.start({
+  apiKey: 'YOUR_API_KEY',
+  autoInstrumentAppStarts: false
+});
+```
+
+Then wrap the App as follows:
+
+```js
+export default BugsnagPerformance.withInstrumentedAppStarts(Index);
+```
+
 ## Troubleshooting
 
 ### JS Bundle: build issues
