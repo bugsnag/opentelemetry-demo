@@ -20,7 +20,7 @@ BugsnagPerformance.start({
   apiKey: apiKey,
   appVersion: process.env.EXPO_PUBLIC_BUGSNAG_APP_VERSION,
   releaseStage: process.env.EXPO_PUBLIC_BUGSNAG_RELEASE_STAGE,
-  autoInstrumentAppStarts: false,
+  autoInstrumentAppStarts: true,
   tracePropagationUrls: [/^(http(s)?(:\/\/))?(www\.)?([0-9A-Za-z-\\.@:%_\+~#=]+)(\.[a-zA-Z]{2,3})?(\/.*)?$/],
 });
 
