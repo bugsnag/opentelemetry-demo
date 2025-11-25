@@ -36,12 +36,6 @@ build_android() {
   log_info "Assembling Android release APK"
   ./gradlew assembleRelease
 
-  log_info "Uploading APK"
-  bundle exec upload-app \
-    --farm=bs \
-    --app=app/build/outputs/apk/release/app-release.apk \
-    --app-id-file=bs-android-url.txt
-
   log_success "Android build completed!"
 }
 
@@ -76,12 +70,6 @@ build_ios() {
     -archivePath reactnativeapp.xcarchive \
     -exportPath output/ \
     -exportOptionsPlist ExportOptions.plist
-
-  log_info "Uploading IPA"
-  bundle exec upload-app \
-    --farm=bs \
-    --app=output/reactnativeapp.ipa \
-    --app-id-file=bs-ios-url.txt
 
   log_success "iOS build completed!"
 }

@@ -8,6 +8,7 @@ steps:
         key: "build_android_app"
         commands:
           - "./src/react-native-app/scripts/build.sh android"
+          - "bundle exec upload-app --farm=bs --app=src/react-native-app/android/app/build/outputs/apk/release/app-release.apk --app-id-file=bs-android-url.txt"
         env:
           JAVA_VERSION: "17"
           NODE_VERSION: "22"
@@ -15,7 +16,7 @@ steps:
           artifacts#v1.5.0:
             upload:
               - "src/react-native-app/android/app/build/outputs/apk/release/app-release.apk"
-              - "src/react-native-app/android/bs-android-url.txt"
+              - "bs-android-url.txt"
         timeout_in_minutes: 20
 
       - label: ":ios: Build iOS App"
@@ -24,6 +25,7 @@ steps:
           queue: "macos-14"
         commands:
           - "./src/react-native-app/scripts/build.sh ios"
+          - "bundle exec upload-app --farm=bs --app=src/react-native-app/ios/output/reactnativeapp.ipa --app-id-file=bs-ios-url.txt"
         env:
           JAVA_VERSION: "17"
           NODE_VERSION: "18"
@@ -32,5 +34,5 @@ steps:
           artifacts#v1.5.0:
             upload:
               - "src/react-native-app/ios/output/reactnativeapp.ipa"
-              - "src/react-native-app/ios/bs-ios-url.txt"
+              - "bs-ios-url.txt"
         timeout_in_minutes: 20
