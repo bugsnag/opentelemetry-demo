@@ -1,0 +1,36 @@
+agents:
+  queue: "macos-15"
+
+steps:
+  - group: ":hammer: Build Apps"
+    steps:
+      - label: ":android: Build Android App"
+        key: "build_android_app"
+        commands:
+          - "./src/react-native-app/scripts/build.sh android"
+        env:
+          JAVA_VERSION: "17"
+          NODE_VERSION: "22"
+        plugins:
+          artifacts#v1.5.0:
+            upload:
+              - "src/react-native-app/android/app/build/outputs/apk/release/app-release.apk"
+              - "src/react-native-app/android/bs-android-url.txt"
+        timeout_in_minutes: 20
+
+      - label: ":ios: Build iOS App"
+        key: "build_ios_app"
+        agents:
+          queue: "macos-14"
+        commands:
+          - "./src/react-native-app/scripts/build.sh ios"
+        env:
+          JAVA_VERSION: "17"
+          NODE_VERSION: "18"
+          XCODE_VERSION: "15.4.0"
+        plugins:
+          artifacts#v1.5.0:
+            upload:
+              - "src/react-native-app/ios/output/reactnativeapp.ipa"
+              - "src/react-native-app/ios/bs-ios-url.txt"
+        timeout_in_minutes: 20
