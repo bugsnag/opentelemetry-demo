@@ -56,7 +56,8 @@
         "src/recommendation/demo_pb2.py",
         "src/recommendation/demo_pb2_grpc.py",
         "internal/tools/",
-        ".buildkite/"
+        ".buildkite/",
+        "src/react-native-app/scripts/"
     ]
   },
   {
