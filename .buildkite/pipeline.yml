@@ -47,6 +47,8 @@ steps:
       - label: ":bitbar: Run Android app"
         depends_on: "build-android-app"
         timeout_in_minutes: 10
+        agents:
+          queue: "opensource"
         plugins:
           docker-compose#v5.12.1:
             run: maze-runner
@@ -54,7 +56,7 @@ steps:
             command:
               - "--farm=bb"
               - "--device==ANDROID_12|ANDROID_13|ANDROID_14|ANDROID_15"
-              - "--app=/app/react-native-app/bb-android-url.txt"
+              - "--app=@/app/react-native-app/bb-android-url.txt"
           artifacts#v1.9.0:
             download:
               - "src/react-native-app/bb-android-url.txt"
@@ -67,14 +69,16 @@ steps:
       - label: ":bitbar: Run iOS app"
         depends_on: "build-ios-app"
         timeout_in_minutes: 10
+        agents:
+          queue: "opensource"
         plugins:
           docker-compose#v5.12.1:
             run: maze-runner
             use-aliases: true
             command:
               - "--farm=bb"
-              - "--device==IOS_14|IOS_15|IOS_16|IOS_17"
-              - "--app=/app/react-native-app/bb-ios-url.txt"
+              - "--device=IOS_14|IOS_15|IOS_16|IOS_17"
+              - "--app=@/app/react-native-app/bb-ios-url.txt"
           artifacts#v1.9.0:
             download:
               - "src/react-native-app/bb-ios-url.txt"
