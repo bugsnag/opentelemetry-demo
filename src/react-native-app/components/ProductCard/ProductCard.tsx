@@ -16,7 +16,9 @@ interface IProps {
 }
 
 async function getImageURL(picture: string) {
-  return `http://${process.env.EXPO_PUBLIC_FRONTEND_PROXY_HOST}:${process.env.EXPO_PUBLIC_FRONTEND_PROXY_PORT}/images/products/${picture}`;
+  let imageUrl = `http://${process.env.EXPO_PUBLIC_FRONTEND_PROXY_HOST}:${process.env.EXPO_PUBLIC_FRONTEND_PROXY_PORT}/images/products/${picture}`;
+  console.error(`Using image URL: ${imageUrl}`);
+  return imageUrl;
 }
 
 const ProductCard = ({
