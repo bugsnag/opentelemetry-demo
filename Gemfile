@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'bugsnag-maze-runner', '~> 10.0'
+gem 'openssl'
 
 # Use a specific branch
 #gem 'bugsnag-maze-runner', git: 'https://github.com/bugsnag/maze-runner', branch: 'main'
