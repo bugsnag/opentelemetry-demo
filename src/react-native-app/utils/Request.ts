@@ -22,9 +22,9 @@ const request = async <T>({
     "content-type": "application/json",
   },
 }: IRequestParams): Promise<T> => {
-  const localhost = await getLocalhost();
-  const API_URL = `http://${localhost}:${process.env.EXPO_PUBLIC_FRONTEND_PROXY_PORT}`;
+  const API_URL = `http://${process.env.EXPO_PUBLIC_FRONTEND_PROXY_HOST}:${process.env.EXPO_PUBLIC_FRONTEND_PROXY_PORT}`;
   const requestURL = `${API_URL}${url}?${new URLSearchParams(queryParams).toString()}`;
+  console.error(`Making request from: ${requestURL}`);
   const requestBody = body ? JSON.stringify(body) : undefined;
   const response = await fetch(requestURL, {
     method,

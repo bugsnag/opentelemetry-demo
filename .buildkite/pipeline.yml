@@ -2,37 +2,91 @@ agents:
   queue: "macos-15"
 
 steps:
-  - group: ":hammer: Build Apps"
+  - group: "Build Apps"
     steps:
       - label: ":android: Build Android App"
-        key: "build_android_app"
+        key: "build-android-app"
         commands:
+          - "./src/react-native-app/scripts/set_build_vars.sh"
           - "./src/react-native-app/scripts/build.sh android"
-          - "bundle exec upload-app --farm=bs --app=src/react-native-app/android/app/build/outputs/apk/release/app-release.apk --app-id-file=bs-android-url.txt"
+          - "bundle exec upload-app --farm=bb --app=src/react-native-app/android/app/build/outputs/apk/release/app-release.apk --app-id-file=./src/react-native-app/bb-android-url.txt"
         env:
           JAVA_VERSION: "17"
           NODE_VERSION: "22"
+          FRONTEND_PROXY_HOST: "placeholder"
+          FRONTEND_PROXY_PORT: "8080"
+          BUGSNAG_API_KEY: "12345678901234567890123456789012"
         plugins:
-          artifacts#v1.5.0:
+          artifacts#v1.9.4:
             upload:
               - "src/react-native-app/android/app/build/outputs/apk/release/app-release.apk"
-              - "bs-android-url.txt"
+              - "src/react-native-app/bb-android-url.txt"
         timeout_in_minutes: 20
 
       - label: ":ios: Build iOS App"
-        key: "build_ios_app"
+        key: "build-ios-app"
         agents:
           queue: "macos-14"
         commands:
+          - "./src/react-native-app/scripts/set_build_vars.sh"
           - "./src/react-native-app/scripts/build.sh ios"
-          - "bundle exec upload-app --farm=bs --app=src/react-native-app/ios/output/reactnativeapp.ipa --app-id-file=bs-ios-url.txt"
+          - "bundle exec upload-app --farm=bb --app=src/react-native-app/ios/output/reactnativeapp.ipa --app-id-file=./src/react-native-app/bb-ios-url.txt"
         env:
           JAVA_VERSION: "17"
           NODE_VERSION: "18"
           XCODE_VERSION: "15.4.0"
+          FRONTEND_PROXY_HOST: "placeholder"
+          FRONTEND_PROXY_PORT: "8080"
+          BUGSNAG_API_KEY: "12345678901234567890123456789012"
         plugins:
-          artifacts#v1.5.0:
+          artifacts#v1.9.4:
             upload:
               - "src/react-native-app/ios/output/reactnativeapp.ipa"
-              - "bs-ios-url.txt"
+              - "src/react-native-app/bb-ios-url.txt"
         timeout_in_minutes: 20
+
+  - group: "Run the app"
+    steps:
+      - label: ":bitbar: Run Android app"
+        depends_on: "build-android-app"
+        timeout_in_minutes: 10
+        agents:
+          queue: "opensource"
+        plugins:
+          docker-compose#v5.12.1:
+            run: maze-runner
+            use-aliases: true
+            command:
+              - "--farm=bb"
+              - "--device==ANDROID_12|ANDROID_13|ANDROID_14|ANDROID_15"
+              - "--app=@/app/react-native-app/bb-android-url.txt"
+          artifacts#v1.9.0:
+            download:
+              - "src/react-native-app/bb-android-url.txt"
+            upload:
+              - "maze_output/maze_output.zip"
+        concurrency: 25
+        concurrency_group: "bitbar"
+        concurrency_method: eager
+
+      - label: ":bitbar: Run iOS app"
+        depends_on: "build-ios-app"
+        timeout_in_minutes: 10
+        agents:
+          queue: "opensource"
+        plugins:
+          docker-compose#v5.12.1:
+            run: maze-runner
+            use-aliases: true
+            command:
+              - "--farm=bb"
+              - "--device=IOS_14|IOS_15|IOS_16|IOS_17"
+              - "--app=@/app/react-native-app/bb-ios-url.txt"
+          artifacts#v1.9.0:
+            download:
+              - "src/react-native-app/bb-ios-url.txt"
+            upload:
+              - "maze_output/maze_output.zip"
+        concurrency: 25
+        concurrency_group: "bitbar"
+        concurrency_method: eager
