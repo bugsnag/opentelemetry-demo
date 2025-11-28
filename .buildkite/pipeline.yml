@@ -1,5 +1,5 @@
 agents:
-  queue: "macos-15"
+  queue: "macos-26"
 
 steps:
   - group: "Build Apps"
@@ -25,8 +25,6 @@ steps:
 
       - label: ":ios: Build iOS App"
         key: "build-ios-app"
-        agents:
-          queue: "macos-14"
         commands:
           - "./src/react-native-app/scripts/set_build_vars.sh"
           - "./src/react-native-app/scripts/build.sh ios"
@@ -34,7 +32,7 @@ steps:
         env:
           JAVA_VERSION: "17"
           NODE_VERSION: "18"
-          XCODE_VERSION: "15.4.0"
+          XCODE_VERSION: "26"
           FRONTEND_PROXY_HOST: "placeholder"
           FRONTEND_PROXY_PORT: "8080"
           BUGSNAG_API_KEY: "12345678901234567890123456789012"
