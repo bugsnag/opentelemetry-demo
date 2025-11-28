@@ -1,5 +1,5 @@
 agents:
-  queue: "macos-26"
+  queue: "macos-15"
 
 steps:
   - group: "Build Apps"
@@ -32,7 +32,7 @@ steps:
         env:
           JAVA_VERSION: "17"
           NODE_VERSION: "18"
-          XCODE_VERSION: "26"
+          XCODE_VERSION: "16"
           FRONTEND_PROXY_HOST: "placeholder"
           FRONTEND_PROXY_PORT: "8080"
           BUGSNAG_API_KEY: "12345678901234567890123456789012"
