@@ -13,9 +13,10 @@ steps:
         env:
           JAVA_VERSION: "17"
           NODE_VERSION: "22"
-          FRONTEND_PROXY_HOST: "placeholder"
-          FRONTEND_PROXY_PORT: "8080"
-          BUGSNAG_API_KEY: "12345678901234567890123456789012"
+          # The following variables are defined in the environment file on our build servers:
+          #   OTEL_DEMO_FRONTEND_PROXY_HOST
+          #   OTEL_DEMO_FRONTEND_PROXY_PORT
+          #   OTEL_DEMO_BUGSNAG_API_KEY
         plugins:
           artifacts#v1.9.4:
             upload:
@@ -35,9 +36,10 @@ steps:
           JAVA_VERSION: "17"
           NODE_VERSION: "18"
           XCODE_VERSION: "15.4.0"
-          FRONTEND_PROXY_HOST: "placeholder"
-          FRONTEND_PROXY_PORT: "8080"
-          BUGSNAG_API_KEY: "12345678901234567890123456789012"
+          # The following variables are defined in the environment file on our build servers:
+          #   OTEL_DEMO_FRONTEND_PROXY_HOST
+          #   OTEL_DEMO_FRONTEND_PROXY_PORT
+          #   OTEL_DEMO_BUGSNAG_API_KEY
         plugins:
           artifacts#v1.9.4:
             upload:
