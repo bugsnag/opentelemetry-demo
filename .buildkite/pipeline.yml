@@ -59,6 +59,7 @@ steps:
             run: maze-runner
             use-aliases: true
             command:
+              - "--no-tunnel"
               - "--farm=bb"
               - "--device==ANDROID_12|ANDROID_13|ANDROID_14|ANDROID_15"
               - "--app=@/app/react-native-app/bb-android-url.txt"
@@ -81,6 +82,7 @@ steps:
             run: maze-runner
             use-aliases: true
             command:
+              - "--no-tunnel"
               - "--farm=bb"
               - "--device=IOS_14|IOS_15|IOS_16|IOS_17"
               - "--app=@/app/react-native-app/bb-ios-url.txt"
