@@ -13,9 +13,10 @@ steps:
         env:
           JAVA_VERSION: "17"
           NODE_VERSION: "22"
-          FRONTEND_PROXY_HOST: "placeholder"
-          FRONTEND_PROXY_PORT: "8080"
-          BUGSNAG_API_KEY: "12345678901234567890123456789012"
+          # The following variables are defined in the environment file on our build servers:
+          #   OTEL_DEMO_FRONTEND_PROXY_HOST
+          #   OTEL_DEMO_FRONTEND_PROXY_PORT
+          #   OTEL_DEMO_BUGSNAG_API_KEY
         plugins:
           artifacts#v1.9.4:
             upload:
@@ -35,9 +36,10 @@ steps:
           JAVA_VERSION: "17"
           NODE_VERSION: "18"
           XCODE_VERSION: "15.4.0"
-          FRONTEND_PROXY_HOST: "placeholder"
-          FRONTEND_PROXY_PORT: "8080"
-          BUGSNAG_API_KEY: "12345678901234567890123456789012"
+          # The following variables are defined in the environment file on our build servers:
+          #   OTEL_DEMO_FRONTEND_PROXY_HOST
+          #   OTEL_DEMO_FRONTEND_PROXY_PORT
+          #   OTEL_DEMO_BUGSNAG_API_KEY
         plugins:
           artifacts#v1.9.4:
             upload:
@@ -47,7 +49,13 @@ steps:
 
   - group: "Run the app"
     steps:
-      - label: ":bitbar: Run Android app"
+      - label: ":bitbar: Run app on {{matrix}}"
+        matrix:
+          - "ANDROID_12"
+          - "ANDROID_13"
+          - "ANDROID_14"
+          - "ANDROID_15"
+          - "ANDROID_16"
         depends_on: "build-android-app"
         timeout_in_minutes: 10
         agents:
@@ -57,8 +65,9 @@ steps:
             run: maze-runner
             use-aliases: true
             command:
+              - "--no-tunnel"
               - "--farm=bb"
-              - "--device==ANDROID_12|ANDROID_13|ANDROID_14|ANDROID_15"
+              - "--device={{matrix}}"
               - "--app=@/app/react-native-app/bb-android-url.txt"
           artifacts#v1.9.0:
             download:
@@ -69,7 +78,13 @@ steps:
         concurrency_group: "bitbar"
         concurrency_method: eager
 
-      - label: ":bitbar: Run iOS app"
+      - label: ":bitbar: Run app on {{matrix}}"
+        matrix:
+          - "IOS_15"
+          - "IOS_16"
+          - "IOS_17"
+          - "IOS_18"
+          - "IOS_26"
         depends_on: "build-ios-app"
         timeout_in_minutes: 10
         agents:
@@ -79,8 +94,9 @@ steps:
             run: maze-runner
             use-aliases: true
             command:
+              - "--no-tunnel"
               - "--farm=bb"
-              - "--device=IOS_14|IOS_15|IOS_16|IOS_17"
+              - "--device={{matrix}}"
               - "--app=@/app/react-native-app/bb-ios-url.txt"
           artifacts#v1.9.0:
             download:
