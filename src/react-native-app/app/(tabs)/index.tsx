@@ -7,7 +7,7 @@ import { ScrollView, StyleSheet } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 import ApiGateway from "@/gateways/Api.gateway";
 import Bugsnag from "@bugsnag/expo";
-import BugsnagPerformance from "@bugsnag/react-native-performance";
+import BugsnagPerformance from "@bugsnag/expo-performance";
 import React from "react";
 
 const apiKey = process.env.EXPO_PUBLIC_BUGSNAG_API_KEY as string;
