@@ -29,10 +29,10 @@ Please follow the root README to do so.
 
 ## Development
 
-To build and run the quote service locally:
+To build and run the quote service locally, from the repository root:
 
 ```sh
-docker build src/quote --target base -t quote
+docker build -f src/quote/Dockerfile --target base -t quote .
 cd src/quote
 docker run --rm -it -v $(pwd):/var/www -e QUOTE_PORT=8999 -p "8999:8999" quote
 ```
