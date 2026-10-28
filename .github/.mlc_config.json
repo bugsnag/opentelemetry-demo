@@ -1,7 +1,8 @@
 {
     "ignorePatterns": [
         {"pattern": "^http://localhost:8080"},
-        {"pattern": "^https://calendar.google.com/calendar"}
+        {"pattern": "^https://calendar.google.com/calendar"},
+        {"pattern": "^https://cloud-native.slack.com/"}
     ],
     "replacementPatterns": [
         {

@@ -12,6 +12,8 @@ RUN chmod +x /usr/local/bin/install-php-extensions \
     protobuf \
     opentelemetry
 
+COPY ./src/quote/docker/hardening.ini /usr/local/etc/php/conf.d/zz-hardening.ini
+
 WORKDIR /var/www
 CMD ["php", "public/index.php"]
 USER www-data
