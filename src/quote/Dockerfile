@@ -2,8 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 
-# Pinned to a patch release: 8.3.36 fixes CVE-2026-109618 and CVE-2026-109619 (PHP2Shell)
-FROM php:8.3.36-cli AS base
+FROM php:8.3-cli AS base
 
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 RUN chmod +x /usr/local/bin/install-php-extensions \
